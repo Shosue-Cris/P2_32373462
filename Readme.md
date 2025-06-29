@@ -1,90 +1,105 @@
-# Valery's Green - Documentación de Implementación (TypeScript)
+📬 Configuración del Servicio de Correos
+Implementación con Nodemailer para envíos masivos
 
-Este proyecto implementa un sistema web en TypeScript con funcionalidades avanzadas de geolocalización, seguridad, notificaciones y pagos simulados. A continuación se detallan las principales integraciones y cómo se implementan en el código.
+typescript
+// src/lib/emailSender.ts  
+import { createTransport } from 'nodemailer';  
+import { env } from 'process';  
 
----
+const mailer = createTransport({  
+  host: 'smtp.gmail.com',  
+  auth: {  
+    user: env.MAIL_ACCOUNT,  
+    pass: env.MAIL_APP_KEY  
+  }  
+});  
 
-## 1. Geolocalización por IP
+export async function dispatchEmail(  
+  emails: string[],  
+  title: string,  
+  body: string  
+) {  
+  const options = {  
+    sender: env.MAIL_ACCOUNT,  
+    recipients: emails.join(', '),  
+    subject: title,  
+    html: body  
+  };  
 
-**Objetivo:** Identificar el país del usuario que completa el formulario de contacto y almacenarlo en la base de datos.
+  try {  
+    const result = await mailer.sendMail(options);  
+    return { ok: true, id: result.messageId };  
+  } catch (err) {  
+    console.log('Falló el envío:', err);  
+    return { ok: false, error: err };  
+  }  
+}  
+💸 Conexión con Pasarela de Pagos
+Servicio para transacciones simuladas
 
-- Se utiliza la API de [ipapi](https://ipapi.com/) para obtener la geolocalización a partir de la IP pública del usuario.
-- En `ContactsController.add`, tras recibir el formulario:
-    - Se obtiene la IP pública con `https://api.ipify.org?format=json`.
-    - Se consulta la API de ipapi usando la IP y la clave de acceso almacenada en .env.
-    - El país (`country_name`) se almacena junto con el resto de los datos del contacto en la base de datos (`ContactsModel.addContact`).
+typescript
+// src/api/paymentGateway.ts  
+import { post } from 'axios';  
 
----
+type PaymentDetails = {  
+  total: string;  
+  card: string;  
+  securityCode: string;  
+  expiry: { month: string; year: string };  
+  name: string;  
+  type: string;  
+  details: string;  
+};  
 
-## 2. Google Analytics
+export async function executePayment(data: PaymentDetails) {  
+  const payload = {  
+    ...data,  
+    transactionId: `txn_${Date.now()}`  
+  };  
 
-**Objetivo:** Recopilar estadísticas de visitas y analizar el comportamiento de los usuarios.
+  const config = {  
+    headers: {  
+      Authorization: `Bearer ${env.PAYMENT_API_TOKEN}`,  
+      'Content-Type': 'application/json'  
+    }  
+  };  
 
-- Agrega el script de Google Analytics en el archivo de layout principal `main-layout.ejs` antes de la etiqueta `</head>`.
-- Ejemplo de integración:
-        ```html
-        <!-- Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=TU_ID_ANALYTICS"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'TU_ID_ANALYTICS');
-        </script>
-        ```
-- Puedes configurar eventos personalizados para rastrear interacciones clave.
+  try {  
+    const response = await post(  
+      'https://fakepayment.onrender.com/payments',  
+      payload,  
+      config  
+    );  
+    return response.data;  
+  } catch (err) {  
+    throw new Error('Error en transacción');  
+  }  
+}  
+🛡️ Validación de reCAPTCHA
+Middleware para protección de formularios
 
----
+typescript
+// src/security/recaptchaValidator.ts  
+export async function validateCaptcha(token: string) {  
+  const url = 'https://www.google.com/recaptcha/api/siteverify';  
+  const params = new URLSearchParams({  
+    secret: env.CAPTCHA_PRIVATE_KEY,  
+    response: token  
+  });  
 
-## 3. Google reCAPTCHA
+  const { data } = await axios.post(url, params.toString(), {  
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }  
+  });  
 
-**Objetivo:** Proteger el formulario de contacto contra bots y spam.
+  return data.success;  
+}  
+📊 Monitoreo con Google Analytics
+Seguimiento de eventos en frontend
 
-- El formulario de reseñas en `index.ejs` incluye el widget de reCAPTCHA.
-- En el frontend, el token de reCAPTCHA se envía junto con los datos del formulario (`public/js/script.js`).
-- En el backend, `ContactsController.add` valida el token usando la API de Google reCAPTCHA y la clave secreta almacenada en .env.
-- Si la validación falla, el formulario no se procesa.
-
----
-
-## 4. Notificación por correo electrónico
-
-**Objetivo:** Enviar un correo a una lista de destinatarios cada vez que se complete el formulario.
-
-- Se utiliza `nodemailer` para enviar correos desde el backend.
-- En `ContactsController.add`, tras validar el formulario y el reCAPTCHA:
-    - Se envía un correo a los destinatarios definidos en las variables de entorno (`emailgmail`, `email1`, `email2`).
-    - El correo incluye nombre, correo, comentario, IP, país y fecha/hora.
-    - La dirección `programacion2ais@yopmail.com` está incluida en la lista de destinatarios.
-
----
-
-## 5. Integración con Fake Payment API
-
-**Objetivo:** Simular pagos usando la API de [https://fakepayment.onrender.com/](https://fakepayment.onrender.com/).
-
-- El formulario de pagos envía los datos a `/payment/add` usando `pagoscript.js`.
-- En el backend, `PaymentController.add` recibe los datos y realiza una petición POST a la Fake Payment API usando el token almacenado en .env.
-- La respuesta se muestra al usuario.
-
----
-
-## 6. Seguridad y Variables de Entorno
-
-- Todas las credenciales sensibles (claves de API, tokens, contraseñas de correo, etc.) se almacenan en el archivo `.env` (ver `.env`).
-- El archivo `.env` está incluido en `.gitignore` y **no debe subirse al repositorio**.
-- Ejemplo de variables en `.env`:
-        ```
-        Url_Ipapi=http://api.ipapi.com/api/
-        Accesskey=XXXXXXXXXXXX
-        keyCapchat=XXXXXXXXXXXX
-        emailgmail=xxxx@gmail.com
-        password_g=xxxx xxxx xxxx xxxx
-        email1=xxxx@gmail.com
-        email2=programacion2ais@yopmail.com
-        keyfakepayment=XXXXXXXXXXXX
-        ```
-
----
-
-
+html
+<!-- Incluir en <head> -->  
+<script>  
+  window.dataLayer = window.dataLayer || [];  
+  function trackEvent() { dataLayer.push(arguments); }  
+  trackEvent('config', env.GA_MEASUREMENT_ID);  
+</script>  
