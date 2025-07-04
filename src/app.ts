@@ -1,7 +1,6 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application, Request, Response, NextFunction ,RequestHandler} from 'express';
 import * as dotenv from 'dotenv';
 dotenv.config();
-
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import passport from '@config/passport.js';
@@ -31,12 +30,10 @@ i18n.configure({
   updateFiles: false,
   objectNotation: true,
 });
-
-// ✅ Middlewares esenciales
 app.use(cookieParser());
-app.use(i18n.init);
+app.use(i18n.init as unknown as RequestHandler);
 
-// ✅ Middleware de sesión
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'tu_clave_secreta',
   resave: false,

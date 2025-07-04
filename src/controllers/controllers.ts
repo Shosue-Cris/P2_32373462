@@ -276,19 +276,17 @@ class ContactsController {
   async getPayment(req: Request, res: Response): Promise<void> {
   try {
     const datePayments = await ContactosModel.getAllPayments();
-    const locale = req.getLocale(); // ✅ Extraer el locale actual del usuario
+    const locale = req.getLocale();
     res.render('getPayments', {
       datePayments,
       isAdmin: true,
-      locale // ✅ Pasar `locale` explícitamente a la vista
+      locale 
     });
   } catch (error: any) {
     console.error('Error:', error);
     res.status(500).send(error);
   }
 }
-
-
   async getComentarios(req: Request, res: Response): Promise<void> {
     try {
       const comentarios = await ContactosModel.getAllContacts();
@@ -301,7 +299,6 @@ class ContactsController {
       });
     }
   }
-
   async index(req: Request, res: Response):Promise<void>{
     try {
       res.render('index', {
@@ -317,7 +314,6 @@ class ContactsController {
       res.status(500).send('Error en el servidor');
     }
   }
-
   login(req: Request, res: Response): void {
     formType = req.query.form as string;
     try {
@@ -330,7 +326,6 @@ class ContactsController {
       });
     }
   }
-
   async registerUser(req: Request, res: Response): Promise<void> {
     const SALT_ROUNDS = 10;
     const { username, email, password_hash, passwordHash }: User = req.body;
