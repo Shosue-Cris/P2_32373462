@@ -8,7 +8,7 @@ import authRoutes from '@routes/auth.js';
 import mainRouter from '@routes/index.js';
 
 import path from 'path';
-import i18n from 'i18n';
+import * as i18n from 'i18n';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

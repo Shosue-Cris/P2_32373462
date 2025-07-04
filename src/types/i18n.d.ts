@@ -1,24 +1,28 @@
-import 'i18n';
-import { Request } from 'express';
+import 'express';
 
 declare module 'i18n' {
-  import { Request, Response } from 'express';
+  import { RequestHandler } from 'express';
 
-  interface i18n {
-    init: (req: Request, res: Response, next: () => void) => void;
-  }
+  const i18n: {
+    __: (...args: any[]) => string;
+    __n: (...args: any[]) => string;
+    configure: (options: any) => void;
+    init: RequestHandler;
+  };
+
+  export = i18n;
 }
 
-declare module 'express' {
-  export interface Request {
-    __: (phraseOrOptions: string | any, ...replace: any[]) => string;
-    __n: (singular: string, plural: string, count: number) => string;
+declare module 'express-serve-static-core' {
+  interface Request {
+    __: (...args: any[]) => string;
+    __n: (...args: any[]) => string;
     setLocale: (locale: string) => void;
     getLocale: () => string;
   }
 
-  export interface Response {
-    __: (phraseOrOptions: string | any, ...replace: any[]) => string;
-    __n: (singular: string, plural: string, count: number) => string;
+  interface Response {
+    __: (...args: any[]) => string;
+    __n: (...args: any[]) => string;
   }
 }
