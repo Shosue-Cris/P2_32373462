@@ -8,6 +8,7 @@ import authRoutes from '@routes/auth.js';
 import mainRouter from '@routes/index.js';
 
 import path from 'path';
+
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const i18n = require('i18n');
@@ -93,7 +94,7 @@ app.use(authRoutes);
 
 // ✅ Página 404
 app.use((req: Request, res: Response) => {
-  res.status(404).render('404', {
+  res.status(404).render('error', {
     title: '404 - ' + res.__('general.error'),
     message: res.__('general.error')
   });
