@@ -272,15 +272,14 @@ class ContactsController {
       });
     }
   }
-
   async getPayment(req: Request, res: Response): Promise<void> {
   try {
     const datePayments = await ContactosModel.getAllPayments();
-    const locale = req.getLocale(); // ✅ Extraer el locale actual del usuario
+    const locale = req.getLocale();
     res.render('getPayments', {
       datePayments,
       isAdmin: true,
-      locale // ✅ Pasar `locale` explícitamente a la vista
+      locale
     });
   } catch (error: any) {
     console.error('Error:', error);
