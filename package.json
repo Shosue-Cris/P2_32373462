@@ -5,12 +5,12 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "nodemon --exec \"node --no-warnings --import tsx/esm src/app.ts\"",
-    "build": "tsc && tsc-alias && cp -r src/public dist/ && cp -r src/views dist/ && cp -r src/config dist/",
+    "build": "tsc && tsc-alias && cp -r src/public dist/ && cp -r src/locales dist/ && cp -r src/views dist/ && cp -r src/config dist/",
     "start": "node dist/app.js",
     "prestart": "npm run build"
   },
   "keywords": [],
-  "author": "SuperAdmin", 
+  "author": "SuperAdmin",
   "license": "ISC",
   "type": "module",
   "dependencies": {
@@ -27,8 +27,11 @@
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
+    "i18n": "^0.15.1",
+    "install": "^0.13.0",
     "nanoid": "^5.1.5",
     "nodemailer": "^7.0.3",
+    "npm": "^11.4.2",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "sequelize": "^6.37.7",
@@ -37,6 +40,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.1",
+    "@types/i18n": "^0.13.12",
     "@types/nanoid": "^2.1.0",
     "@types/node": "^22.15.9",
     "copyfiles": "^2.4.1",

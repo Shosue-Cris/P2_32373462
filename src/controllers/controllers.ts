@@ -190,7 +190,7 @@ class ContactsController {
     try {
       const contacts = await ContactosModel.getAllContacts();
       console.log("Datos a renderizar:", contacts);
-      res.render('contactos', { contacts, isAdmin: true });
+      res.render('contactos', { contacts, isAdmin: true,currentLocale: req.getLocale() || 'es'});
     } catch (error: any) {
       console.error('Error:', error);
       res.status(500).render('error', { message: 'Error al cargar contactos' });
@@ -274,14 +274,20 @@ class ContactsController {
   }
 
   async getPayment(req: Request, res: Response): Promise<void> {
-    try {
-      const datePayments = await ContactosModel.getAllPayments();
-      res.render('getPayments', { datePayments, isAdmin: true });
-    } catch (error: any) {
-      console.error('Error:', error);
-     res.status(500).send(error);
-    }
+  try {
+    const datePayments = await ContactosModel.getAllPayments();
+    const locale = req.getLocale(); // ✅ Extraer el locale actual del usuario
+    res.render('getPayments', {
+      datePayments,
+      isAdmin: true,
+      locale // ✅ Pasar `locale` explícitamente a la vista
+    });
+  } catch (error: any) {
+    console.error('Error:', error);
+    res.status(500).send(error);
   }
+}
+
 
   async getComentarios(req: Request, res: Response): Promise<void> {
     try {
@@ -295,8 +301,8 @@ class ContactsController {
       });
     }
   }
-   
-  async index(req: Request, res: Response): Promise<void> {
+
+  async index(req: Request, res: Response):Promise<void>{
     try {
       res.render('index', {
         sitioKey: process.env.SITIO_KEY,
@@ -315,8 +321,8 @@ class ContactsController {
   login(req: Request, res: Response): void {
     formType = req.query.form as string;
     try {
-      res.render('auth', { formType, isAdmin: false });
-    } catch (error: any) {
+      res.render('auth', { formType, isAdmin: false});
+    } catch (error: any){
       console.error('', error.message);
       res.status(500).json({
         status: false,
@@ -382,56 +388,56 @@ class ContactsController {
   }
 
   async loginPost(req: Request, res: Response):Promise<void>{
-  try {
-    const { email, password } = req.body;
+    try {
+      const { email, password } = req.body;
 
-    if (!email || !password) {
-      res.json({ status: false, message: '¡Faltan credenciales!' });
-      return;
-    }
+      if (!email || !password) {
+        res.json({ status: false, message: '¡Faltan credenciales!' });
+        return;
+      }
 
     // Llamar al modelo con la nueva firma de retorno tipada
-    const result = await ContactosModel.loginPost({ email, password });
+      const result = await ContactosModel.loginPost({ email, password });
 
-    if (!result.success) {
-      res.json({ status: false, message: result.message || 'Credenciales incorrectas' });
-      return;
+      if (!result.success) {
+        res.json({ status: false, message: result.message || 'Credenciales incorrectas' });
+        return;
+      }
+
+      if (result.user) {
+        req.session.userId = result.user.id;
+        req.session.username = result.user.username || result.user.email;
+
+        res.json({
+          status: true,
+          message: '¡Bienvenido al sistema!',
+          user: {
+            id: result.user.id,
+            email: result.user.email,
+            username: result.user.username
+          }
+        });
+        return;
+      }
+
+      res.json({ status: false, message: 'Error en la autenticación' });
+
+    } catch (error) {
+      console.error('Error en login:', error);
+      res.json({ status: false, message: 'Error interno del servidor' });
     }
-
-    if (result.user) {
-      req.session.userId = result.user.id;
-      req.session.username = result.user.username || result.user.email;
-
-      res.json({
-        status: true,
-        message: '¡Bienvenido al sistema!',
-        user: {
-          id: result.user.id,
-          email: result.user.email,
-          username: result.user.username
-        }
-      });
-      return;
-    }
-
-    res.json({ status: false, message: 'Error en la autenticación' });
-
-  } catch (error) {
-    console.error('Error en login:', error);
-    res.json({ status: false, message: 'Error interno del servidor' });
   }
-}
 
-async logout(req: Request, res: Response): Promise<void> {
-  req.session.destroy((err:any) => {
-    if (err) {
-      console.error('Error al cerrar sesión:', err);
-      res.status(500).json({ message: 'Error al cerrar sesión' });
-      return;
-    }
-    res.redirect('/');
-  });
-}
+  async logout(req: Request, res: Response): Promise<void> {
+    req.session.destroy((err:any) => {
+      if (err) {
+        console.error('Error al cerrar sesión:', err);
+        res.status(500).json({ message: 'Error al cerrar sesión' });
+        return;
+      }
+      res.redirect('/');
+    });
+  }
 }
 
 export default new ContactsController();

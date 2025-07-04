@@ -70,16 +70,24 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-  <div class="max-w-5xl w-full grid md:grid-cols-2 gap-8">
+<body class="min-h-screen bg-slate-100 flex items-center justify-center p-4 relative">
+  <!-- Selector de idioma centrado arriba -->
+  <div class="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-3 text-sm">
+    <a href="/payment?lang=es" class="hover:text-blue-600 font-medium transition-colors duration-200">🇪🇸 Español</a>
+    <span class="text-gray-400">|</span>
+    <a href="/payment?lang=en" class="hover:text-blue-600 font-medium transition-colors duration-200">🇺🇸 English</a>
+  </div>
+
+  <!-- Contenedor del contenido principal -->
+  <div class="container max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 mt-20">
     <!-- Tarjeta de crédito visual -->
-    <div class="bg-white rounded-xl shadow-card p-6 h-fit">
+    <div class="bg-white rounded-xl shadow-card p-6">
       <div class="mb-6">
         <div class="flex items-center mb-2">
-          <h1 class="text-xl font-semibold text-gray-800 mr-2">Información de Pago</h1>
+          <h1 class="text-xl font-semibold text-gray-800 mr-2"><%= __('payment.cardInfoTitle') %></h1>
           <i class="fas fa-credit-card text-primary-500"></i>
         </div>
-        <p class="text-gray-500 text-sm">Complete los detalles de su tarjeta</p>
+        <p class="text-gray-500 text-sm"><%= __('payment.cardInfoDesc') %></p>
       </div>
       
       <div class="card-preview p-6 mb-6 h-44">
@@ -88,11 +96,11 @@
           <div class="text-xl tracking-widest font-medium mb-6" id="cardNumberPreview">•••• •••• •••• ••••</div>
           <div class="flex justify-between items-end">
             <div>
-              <div class="text-xs opacity-80">TITULAR</div>
-              <div class="text-sm font-medium uppercase tracking-wider" id="cardNamePreview">NOMBRE DEL TITULAR</div>
+              <div class="text-xs opacity-80"><%= __('payment.cardHolderLabel') %></div>
+              <div class="text-sm font-medium uppercase tracking-wider" id="cardNamePreview"><%= __('payment.cardHolderPlaceholder') %></div>
             </div>
             <div>
-              <div class="text-xs opacity-80">EXPIRA</div>
+              <div class="text-xs opacity-80"><%= __('payment.cardExpiryLabel') %></div>
               <div class="text-sm font-medium" id="cardExpiryPreview">MM/AA</div>
             </div>
           </div>
@@ -101,32 +109,35 @@
       
       <div class="flex items-center text-sm text-gray-500">
         <i class="fas fa-lock text-success-500 mr-2"></i>
-        <span>Pago seguro con encriptación SSL</span>
+        <span><%= __('payment.securePayment') %></span>
       </div>
     </div>
     
     <!-- Formulario de pago -->
     <div class="bg-white rounded-xl shadow-card p-6">
       <div class="mb-6">
-        <h2 class="text-xl font-semibold text-gray-800">Detalles del Pago</h2>
-        <p class="text-gray-500 text-sm">Ingrese la información requerida para procesar su transacción</p>
+        <h2 class="text-xl font-semibold text-gray-800"><%= __('payment.detailsTitle') %></h2>
+        <p class="text-gray-500 text-sm"><%= __('payment.detailsDesc') %></p>
       </div>
       
-      <form id='formularioPayment' class="space-y-4">
+      <form id="formularioPayment" class="space-y-4">
+        <!-- Correo -->
         <div>
-          <label for="correo" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-          <input type="email" id="correo" name="correo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 transition" placeholder="tucorreo@ejemplo.com" required>
+          <label for="correo" class="block text-sm font-medium text-gray-700 mb-1"><%= __('payment.emailLabel') %></label>
+          <input type="email" id="correo" name="correo" placeholder="<%= __('payment.emailPlaceholder') %>" required class="form-input w-full px-4 py-2 border rounded-lg">
         </div>
-        
+
+        <!-- Nombre -->
         <div>
-          <label for="nombreTitular" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Titular</label>
-          <input type="text" id="nombreTitular" name="nombreTitular" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 transition" placeholder="Como aparece en la tarjeta" required>
+          <label for="nombreTitular" class="block text-sm font-medium text-gray-700 mb-1"><%= __('payment.holderNameLabel') %></label>
+          <input type="text" id="nombreTitular" name="nombreTitular" placeholder="<%= __('payment.holderNamePlaceholder') %>" required class="form-input w-full px-4 py-2 border rounded-lg">
         </div>
-        
+
+        <!-- Número de tarjeta -->
         <div>
-          <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-1">Número de Tarjeta</label>
-          <select name="cardNumber" id="cardNumber" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 transition" required>
-            <option value="" disabled selected>Seleccione una tarjeta de prueba</option>
+          <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-1"><%= __('payment.cardNumberLabel') %></label>
+          <select id="cardNumber" name="cardNumber" required class="form-input w-full px-4 py-2 border rounded-lg">
+            <option disabled selected><%= __('payment.selectTestCard') %></option>
             <option value="4111111111111111">Visa: 4111 1111 1111 1111</option>
             <option value="5555555555554444">Mastercard: 5555 5555 5555 4444</option>
             <option value="378282246310005">Amex: 3782 822463 10005</option>
@@ -134,23 +145,25 @@
           </select>
         </div>
 
+        <!-- Descripción -->
         <div>
-          <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-          <input type="text" id="descripcion" name="descripcion" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 transition" placeholder="Ingresa descripción del pago" required>
+          <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1"><%= __('payment.descriptionLabel') %></label>
+          <input type="text" id="descripcion" name="descripcion" placeholder="<%= __('payment.descriptionPlaceholder') %>" required class="form-input w-full px-4 py-2 border rounded-lg">
         </div>
-        
+
+        <!-- Expiración y CVV -->
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Expiración</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1"><%= __('payment.expiryDateLabel') %></label>
             <div class="flex gap-2">
-              <select id="expMonth" name="expMonth" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 transition" required>
-                <option value="" disabled selected>Mes</option>
+              <select id="expMonth" name="expMonth" required class="form-input w-full px-4 py-2 border rounded-lg">
+                <option disabled selected><%= __('payment.month') %></option>
                 <% for(let i = 1; i <= 12; i++) { %>
                   <option value="<%= i < 10 ? '0' + i : i %>"><%= i < 10 ? '0' + i : i %></option>
                 <% } %>
               </select>
-              <select id="expYear" name="expYear" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 transition" required>
-                <option value="" disabled selected>Año</option>
+              <select id="expYear" name="expYear" required class="form-input w-full px-4 py-2 border rounded-lg">
+                <option disabled selected><%= __('payment.year') %></option>
                 <% const currentYear = new Date().getFullYear(); %>
                 <% for(let i = 0; i < 10; i++) { %>
                   <option value="<%= currentYear + i %>"><%= currentYear + i %></option>
@@ -158,32 +171,34 @@
               </select>
             </div>
           </div>
-          
+
           <div>
-            <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">Código de Seguridad</label>
-            <input type="text" id="cvv" name="cvv" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 transition" placeholder="123" pattern="[0-9]{3,4}" required>
+            <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1"><%= __('payment.securityCodeLabel') %></label>
+            <input type="text" id="cvv" name="cvv" placeholder="123" pattern="[0-9]{3,4}" required class="form-input w-full px-4 py-2 border rounded-lg">
           </div>
         </div>
-        
+
+        <!-- Moneda y Monto -->
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Moneda</label>
-            <select id="currency" name="currency" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 transition" required>
+            <label class="block text-sm font-medium text-gray-700 mb-1"><%= __('payment.currencyLabel') %></label>
+            <select id="currency" name="currency" required class="form-input w-full px-4 py-2 border rounded-lg">
               <option value="USD">USD $</option>
               <option value="EUR">EUR €</option>
               <option value="GBP">GBP £</option>
               <option value="JPY">JPY ¥</option>
             </select>
           </div>
-          
+
           <div>
-            <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Monto</label>
-            <input type="number" id="amount" name="amount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 transition" placeholder="0.00" min="0" step="0.01" required>
+            <label for="amount" class="block text-sm font-medium text-gray-700 mb-1"><%= __('payment.amountLabel') %></label>
+            <input type="number" id="amount" name="amount" placeholder="0.00" step="0.01" min="0" required class="form-input w-full px-4 py-2 border rounded-lg">
           </div>
         </div>
-        
+
+        <!-- Botón -->
         <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center mt-6">
-          <i class="fas fa-lock mr-2"></i> Confirmar Pago
+          <i class="fas fa-lock mr-2"></i> <%= __('payment.confirmPayment') %>
         </button>
       </form>
     </div>
@@ -191,14 +206,13 @@
 
   <script src='js/fetch2.js'></script>
   <script>
-    // Actualización en tiempo real de la tarjeta de vista previa
-    document.getElementById('nombreTitular').addEventListener('input', function(e) {
+    // Preview dinámico
+    document.getElementById('nombreTitular').addEventListener('input', e => {
       document.getElementById('cardNamePreview').textContent = e.target.value.toUpperCase() || 'NOMBRE DEL TITULAR';
     });
 
-    document.getElementById('cardNumber').addEventListener('change', function(e) {
-      const value = e.target.value;
-      const last4 = value.slice(-4);
+    document.getElementById('cardNumber').addEventListener('change', e => {
+      const last4 = e.target.value.slice(-4);
       document.getElementById('cardNumberPreview').textContent = `•••• •••• •••• ${last4}`;
     });
 
@@ -212,4 +226,5 @@
     }
   </script>
 </body>
+
 </html>

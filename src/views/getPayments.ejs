@@ -24,308 +24,163 @@
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
-    <header class="bg-white shadow-md sticky top-0 z-50">
+   <header class="bg-white shadow-md sticky top-0 z-50">
   <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-    <!-- Logo -->
     <div class="flex items-center">
       <h1 class="text-2xl font-bold text-blue-600">
-        Event<span class="text-blue-800">Space</span>
+        <%= __('brand.name') %><span class="text-blue-800"><%= __('brand.highlight') %></span>
       </h1>
-      <p class="ml-2 text-sm text-blue-400 hidden sm:block">Espacios que inspiran</p>
+      <p class="ml-2 text-sm text-blue-400 hidden sm:block"><%= __('brand.tagline') %></p>
     </div>
 
-    <!-- Menú para móvil -->
-    <button 
+    <button
       class="md:hidden text-blue-600 focus:outline-none"
-      aria-label="Abrir menú"
+      aria-label="<%= __('menu.toggle') %>"
       onclick="document.querySelector('.main-nav').classList.toggle('hidden')"
     >
       <i class="fas fa-bars text-2xl"></i>
     </button>
 
-    <!-- Navegación principal -->
     <nav class="main-nav hidden md:block">
       <ul class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-6">
-        <li>
-          <a href="#home" class="text-blue-600 hover:text-blue-800 font-medium transition-colors px-2 py-1 rounded hover:bg-blue-50">
-            Inicio
-          </a>
-        </li>
-        <li>
-          <a href="#services" class="text-blue-600 hover:text-blue-800 font-medium transition-colors px-2 py-1 rounded hover:bg-blue-50">
-            Servicios
-          </a>
-        </li>
-        <li>
-          <a href="#spaces" class="text-blue-600 hover:text-blue-800 font-medium transition-colors px-2 py-1 rounded hover:bg-blue-50">
-            Espacios
-          </a>
-        </li>
-        <li>
-          <a href="/getPayment" class="text-blue-600 hover:text-blue-800 font-medium transition-colors px-2 py-1 rounded hover:bg-blue-50">
-            Pagos
-          </a>
-        </li>
-        <li>
-          <a href="/admin/contacts" class="text-blue-600 hover:text-blue-800 font-medium transition-colors px-2 py-1 rounded hover:bg-blue-50">
-            Contacto
-          </a>
-        </li>
-        <li>
-          <a href="/login" class="bg-blue-100 text-blue-700 hover:bg-blue-200 font-medium transition-colors px-3 py-2 rounded-md">
-            Login
-          </a>
-        </li>
+        <% ['home','services','spaces','payments','contact','login'].forEach(key => { %>
+          <li><a href="<%= __('nav.'+key+'_href') %>" class="text-blue-600 hover:text-blue-800 font-medium transition-colors px-2 py-1 rounded hover:bg-blue-50"><%= __('header.nav.'+key) %></a></li>
+        <% }) %>
         <% if(isAdmin){ %>
-        <li>
-          <a href="/logout" class="bg-red-100 text-red-600 hover:bg-red-200 font-medium transition-colors px-3 py-2 rounded-md">
-            Logout
-          </a>
-        </li>
+        <li><a href="<%= __('nav.logout_href') %>" class="bg-red-100 text-red-600 hover:bg-red-200 font-medium transition-colors px-3 py-2 rounded-md"><%= __('header.nav.logout') %></a></li>
         <% } %>
       </ul>
     </nav>
   </div>
 </header>
-    <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <div class="flex items-center gap-3 mb-4 md:mb-0">
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
-                    <i class="fas fa-credit-card text-blue-500 mr-2"></i> Registros de Pagos
-                </h1>
-            </div>
-            <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full">
-                <span class="text-xl font-semibold text-blue-600"><%= datePayments.length %></span>
-                <span class="text-gray-600">Transacciones</span>
-            </div>
-        </div>
 
-        <!-- Filtros -->
-        <form id="filterForm" class="mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="md:col-span-2">
-                    <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
-                    <input id="searchInput" type="text" placeholder="Nombre o correo" 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                </div>
-                
-                <div>
-                    <label for="estadoSelect" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                    <select id="estadoSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Todos</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
-                        <option value="pendiente">Pendiente</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label for="servicioSelect" class="block text-sm font-medium text-gray-700 mb-1">Servicio</label>
-                    <select id="servicioSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Todos</option>
-                        <option value="Suscripción Mensual">Suscripción Mensual</option>
-                        <option value="Suscripción Anual">Suscripción Anual</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label for="fechaInicio" class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
-                    <input type="date" id="fechaInicio" 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                
-                <div>
-                    <label for="fechaFin" class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
-                    <input type="date" id="fechaFin" 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
-            </div>
-        </form>
+<div class="text-center mb-4">
+    <a href="/getPayment?lang=es" class="hover:text-blue-600 font-medium transition-colors duration-200">
+      🇪🇸 Español
+    </a>
+    <span class="text-gray-400">|</span>
+    <a href="/getPayment?lang=en" class="hover:text-blue-600 font-medium transition-colors duration-200">
+      🇺🇸 English
+    </a>
+  </div>
 
-        <!-- Contenedor principal -->
-        <div id="contactsContainer" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
-            <% if (datePayments.length > 0) { %>
-                <!-- Tabla para pantallas grandes -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="w-full min-w-max">
-                        <thead class="bg-gray-50">
-                            <tr class="text-left text-gray-500 text-sm font-medium">
-                                <th class="px-6 py-3">Titular</th>
-                                <th class="px-6 py-3">Correo</th>
-                                <th class="px-6 py-3">Tarjeta</th>
-                                <th class="px-6 py-3">Expiración</th>
-                                <th class="px-6 py-3">Monto</th>
-                                <th class="px-6 py-3">Descripción</th>
-                                <th class="px-6 py-3">Referencia</th>
-                                <th class="px-6 py-3">Fecha</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <% datePayments.forEach(payment => { %>
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
-                                                <%= payment.nombreTitular.charAt(0).toUpperCase() %>
-                                            </div>
-                                            <span class="font-medium text-gray-900"><%= payment.nombreTitular %></span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <a href="mailto:<%= payment.correo %>" class="text-blue-600 hover:underline"><%= payment.correo %></a>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-3">
-                                            <% if (['4'].includes(payment.cardNumber.charAt(0))) { %>
-                                                <i class="fab fa-cc-visa text-blue-600 text-xl"></i>
-                                            <% } else if (['5'].includes(payment.cardNumber.charAt(0))) { %>
-                                                <i class="fab fa-cc-mastercard text-red-600 text-xl"></i>
-                                            <% } else if (['3'].includes(payment.cardNumber.charAt(0))) { %>
-                                                <i class="fab fa-cc-amex text-blue-400 text-xl"></i>
-                                            <% } else { %>
-                                                <i class="fas fa-credit-card text-gray-400 text-xl"></i>
-                                            <% } %>
-                                            <span class="text-gray-700">•••• •••• •••• <%= payment.cardNumber.slice(-4) %></span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-gray-600">
-                                        <%= payment.expMonth %>/<%= payment.expYear.toString().slice(-2) %>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="font-medium">
-                                            <%= payment.amount %>
-                                            <span class="text-sm text-gray-500 ml-1">
-                                                <% if (payment.currency === 'USD') { %>
-                                                    USD
-                                                <% } else if (payment.currency === 'EUR') { %>
-                                                    EUR
-                                                <% } else if (payment.currency === 'GBP') { %>
-                                                    GBP
-                                                <% } else { %>
-                                                    <%= payment.currency %>
-                                                <% } %>
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-gray-600 line-clamp-2">
-                                        <%= payment.descripcion %>
-                                    </td>
-                                    <td class="px-6 py-4 text-gray-600 font-mono">
-                                        <%= payment.reference %>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm text-gray-500">
-                                            <div><%= new Date(payment.createdAt).toLocaleDateString() %></div>
-                                            <div class="text-xs"><%= new Date(payment.createdAt).toLocaleTimeString() %></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Tarjetas para móviles -->
-                <div class="md:hidden grid grid-cols-1 gap-4 p-4">
-                    <% datePayments.forEach(payment => { %>
-                        <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
-                            <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
-                                        <%= payment.nombreTitular.charAt(0).toUpperCase() %>
-                                    </div>
-                                    <h3 class="font-medium text-gray-900"><%= payment.nombreTitular %></h3>
-                                </div>
-                                <span class="text-xs px-2 py-1 rounded-full ${
-                                    payment.estado === 'aprobado' ? 'bg-green-100 text-green-800' :
-                                    payment.estado === 'rechazado' ? 'bg-red-100 text-red-800' :
-                                    'bg-yellow-100 text-yellow-800'
-                                }">
-                                    <%= payment.estado.toUpperCase() %>
-                                </span>
-                            </div>
-                            
-                            <div class="p-4 space-y-3">
-                                <div class="flex items-center">
-                                    <span class="text-sm text-gray-500 w-24 flex-shrink-0">Correo:</span>
-                                    <a href="mailto:<%= payment.correo %>" class="text-sm text-blue-600 hover:underline"><%= payment.correo %></a>
-                                </div>
-                                
-                                <div class="flex items-center">
-                                    <span class="text-sm text-gray-500 w-24 flex-shrink-0">Tarjeta:</span>
-                                    <div class="flex items-center gap-2">
-                                        <% if (['4'].includes(payment.cardNumber.charAt(0))) { %>
-                                            <i class="fab fa-cc-visa text-blue-600"></i>
-                                        <% } else if (['5'].includes(payment.cardNumber.charAt(0))) { %>
-                                            <i class="fab fa-cc-mastercard text-red-600"></i>
-                                        <% } else if (['3'].includes(payment.cardNumber.charAt(0))) { %>
-                                            <i class="fab fa-cc-amex text-blue-400"></i>
-                                        <% } else { %>
-                                            <i class="fas fa-credit-card text-gray-400"></i>
-                                        <% } %>
-                                        <span class="text-sm text-gray-700">•••• •••• •••• <%= payment.cardNumber.slice(-4) %></span>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-center">
-                                    <span class="text-sm text-gray-500 w-24 flex-shrink-0">Expira:</span>
-                                    <span class="text-sm text-gray-700"><%= payment.expMonth %>/<%= payment.expYear.toString().slice(-2) %></span>
-                                </div>
-                                
-                                <div class="flex items-center">
-                                    <span class="text-sm text-gray-500 w-24 flex-shrink-0">Monto:</span>
-                                    <span class="text-sm font-medium text-gray-700">
-                                        <%= payment.amount %>
-                                        <span class="text-gray-500 ml-1">
-                                            <% if (payment.currency === 'USD') { %>
-                                                USD
-                                            <% } else if (payment.currency === 'EUR') { %>
-                                                EUR
-                                            <% } else if (payment.currency === 'GBP') { %>
-                                                GBP
-                                            <% } else { %>
-                                                <%= payment.currency %>
-                                            <% } %>
-                                        </span>
-                                    </span>
-                                </div>
-                                
-                                <div class="flex items-start">
-                                    <span class="text-sm text-gray-500 w-24 flex-shrink-0">Descripción:</span>
-                                    <span class="text-sm text-gray-700 line-clamp-2"><%= payment.descripcion %></span>
-                                </div>
-                                
-                                <div class="flex items-start">
-                                    <span class="text-sm text-gray-500 w-24 flex-shrink-0">Referencia:</span>
-                                    <span class="text-sm text-gray-700 font-mono"><%= payment.reference %></span>
-                                </div>
-                            </div>
-                            
-                            <div class="p-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500">
-                                <div class="flex items-center">
-                                    <i class="far fa-calendar-alt mr-1"></i>
-                                    <span><%= new Date(payment.createdAt).toLocaleDateString() %></span>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="far fa-clock mr-1"></i>
-                                    <span><%= new Date(payment.createdAt).toLocaleTimeString() %></span>
-                                </div>
-                            </div>
-                        </div>
-                    <% }); %>
-                </div>
-            <% } else { %>
-                <div class="text-center py-12">
-                    <div class="mx-auto w-48 h-48 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-inbox text-4xl text-gray-400"></i>
-                    </div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-1">No hay registros</h3>
-                    <p class="text-gray-500">No hay registros de pagos disponibles</p>
-                </div>
-            <% } %>
-        </div>
+<div class="container mx-auto px-4 py-8">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+    <div class="flex items-center gap-3 mb-4 md:mb-0">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+        <i class="fas fa-credit-card text-blue-500 mr-2"></i> <%= __('payments.title') %>
+      </h1>
     </div>
+    <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full">
+      <span class="text-xl font-semibold text-blue-600"><%= datePayments.length %></span>
+      <span class="text-gray-600"><%= __('payments.transactions') %></span>
+    </div>
+  </div>
+
+  <form id="filterForm" class="mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="md:col-span-2">
+        <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-1"><%= __('filters.search') %></label>
+        <input id="searchInput" type="text" placeholder="<%= __('filters.placeholder') %>" class="...">
+      </div>
+
+      <div>
+        <label for="estadoSelect" class="..."><%= __('filters.status') %></label>
+        <select id="estadoSelect" class="...">
+          <option value=""><%= __('status.all') %></option>
+          <option value="aprobado"><%= __('status.approved') %></option>
+          <option value="rechazado"><%= __('status.rejected') %></option>
+          <option value="pendiente"><%= __('status.pending') %></option>
+        </select>
+      </div>
+
+      <div>
+        <label for="servicioSelect" class="..."><%= __('filters.service') %></label>
+        <select id="servicioSelect" class="...">
+          <option value=""><%= __('services.all') %></option>
+          <option value="monthly"><%= __('services.monthly') %></option>
+          <option value="annual"><%= __('services.annual') %></option>
+        </select>
+      </div>
+
+      <div>
+        <label for="fechaInicio" class="..."><%= __('filters.from') %></label>
+        <input type="date" id="fechaInicio" class="...">
+      </div>
+
+      <div>
+        <label for="fechaFin" class="..."><%= __('filters.to') %></label>
+        <input type="date" id="fechaFin" class="...">
+      </div>
+    </div>
+  </form>
+
+  <div id="contactsContainer" class="bg-white rounded-xl shadow-sm overflow-hidden border">
+    <% if (datePayments.length > 0) { %>
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr class="text-gray-500 text-sm font-medium">
+              <% ['holder','email','card','expiry','amount','description','reference','date'].forEach(col => { %>
+                <th class="px-6 py-3"><%= __('payments.table.'+col) %></th>
+              <% }) %>
+            </tr>
+          </thead>
+          <tbody>
+            <% datePayments.forEach(payment => { 
+                 const date = new Intl.DateTimeFormat(locale).format(new Date(payment.createdAt));
+                 const time = new Intl.DateTimeFormat(locale, {hour:'2-digit', minute:'2-digit'}).format(new Date(payment.createdAt));
+                 const number = new Intl.NumberFormat(locale, {style:'currency',currency: payment.currency}).format(payment.amount);
+            %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4"><%= payment.nombreTitular %></td>
+              <td class="px-6 py-4"><a href="mailto:<%= payment.correo %>"><%= payment.correo %></a></td>
+              <td class="px-6 py-4">•••• •••• •••• <%= payment.cardNumber.slice(-4) %></td>
+              <td class="px-6 py-4 text-gray-600"><%= payment.expMonth %>/<%= payment.expYear.toString().slice(-2) %></td>
+              <td class="px-6 py-4"><%= number %></td>
+              <td class="px-6 py-4 text-gray-600 line-clamp-2"><%= payment.descripcion %></td>
+              <td class="px-6 py-4 text-gray-600 font-mono"><%= payment.reference %></td>
+              <td class="px-6 py-4 text-sm text-gray-500"><div><%= date %></div><div class="text-xs"><%= time %></div></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="md:hidden grid gap-4 p-4">
+        <% datePayments.forEach(payment => { 
+             const date = new Intl.DateTimeFormat(locale).format(new Date(payment.createdAt));
+             const time = new Intl.DateTimeFormat(locale, {hour:'2-digit', minute:'2-digit'}).format(new Date(payment.createdAt));
+             const number = new Intl.NumberFormat(locale, {style:'currency',currency: payment.currency}).format(payment.amount);
+        %>
+        <div class="bg-white rounded-lg shadow border overflow-hidden">
+          <div class="p-4 bg-gray-50 flex justify-between">
+            <h3><%= payment.nombreTitular %></h3>
+            <span class="<%= payment.estado === 'aprobado'? 'approved': payment.estado==='rechazado'? 'rejected': 'pending' %>"><%= __('status.'+payment.estado) %></span>
+          </div>
+          <div class="p-4 space-y-3">
+            <div><strong><%= __('mobile.email') %></strong> <a href="mailto:<%= payment.correo %>"><%= payment.correo %></a></div>
+            <div><strong><%= __('mobile.card') %></strong> •••• •••• •••• <%= payment.cardNumber.slice(-4) %></div>
+            <div><strong><%= __('mobile.expires') %></strong> <%= payment.expMonth %>/<%= payment.expYear.toString().slice(-2) %></div>
+            <div><strong><%= __('mobile.amount') %></strong> <%= number %></div>
+            <div><strong><%= __('mobile.description') %></strong> <%= payment.descripcion %></div>
+            <div><strong><%= __('mobile.reference') %></strong> <%= payment.reference %></div>
+          </div>
+          <div class="p-3 bg-gray-50 flex justify-between text-xs text-gray-500">
+            <span><%= date %></span><span><%= time %></span>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="text-center py-12">
+        <h3 class="text-lg font-medium text-gray-900 mb-1"><%= __('empty.title') %></h3>
+        <p class="text-gray-500"><%= __('empty.subtitle') %></p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
     <script src="/js/filterPayment.js"></script>
     <script>
   // Cerrar menú al hacer clic en un enlace (para móviles)
