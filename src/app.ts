@@ -8,7 +8,10 @@ import authRoutes from '@routes/auth.js';
 import mainRouter from '@routes/index.js';
 
 import path from 'path';
-import * as i18n from 'i18n';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const i18n = require('i18n');
+
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
