@@ -93,7 +93,7 @@ app.use(authRoutes);
 
 // ✅ Página 404
 app.use((req: Request, res: Response) => {
-  res.status(404).render('404', {
+  res.status(404).render('404',{
     title: '404 - ' + res.__('general.error'),
     message: res.__('general.error')
   });
